@@ -25,7 +25,7 @@ mongoose.connect ('mongodb://localhost:27017/cursofavoritos' , (err,res) =>{
 		//Crear el servidor
 		//Parametros: Puerto, callback
 		app.listen(port,function(){
-		console.log (`API REST FAVORITOS funcionandon en http://localhost:${port}`);
+		console.log (`API REST FAVORITOS funcionando en http://localhost:${port}`);
 		}); 
 
 	}

@@ -1,6 +1,7 @@
 'use strict'
 
 var mongoose = require ('mongoose');
+//Cargar el esquema de mongoose - Permite definir objetos
 var Schema = mongoose.Schema;
 
 //Definimos un tipo de objeto Favorito a partir de Schema
@@ -10,4 +11,4 @@ var FavoritoSchema = Schema({
 	url: String
 });
 
-module.export = mongoose.model('Favorito', FavoritoSchema);
+module.exports = mongoose.model('Favorito', FavoritoSchema);

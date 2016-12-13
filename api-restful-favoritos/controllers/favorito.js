@@ -25,13 +25,41 @@ function prueba (req, res)  {
 function getFavorito (req,res){
 
 	var favoritoId = req.params.id;
-	res.status(200).send({data: favoritoId});
+
+	//Para obtener un favorito a partir de su id utilizamos el método
+	//findById que nos facilita moongose
+	Favorito.findById(favoritoId, function (err, favorito){
+
+		if (err){
+			res.status(500).send({message: 'Error al devolver el marcador'});
+		}
+
+		if(!favorito){
+			res.status(404).send({message: 'No hay marcadores'});
+		}
+
+		res.status(200).send({favorito});
+
+	})
+
 }
 
 function getFavoritos (req,res){
+	//Utilizamos el Modelo
+	//Primer parametro orden, where... y segundo parametro función de Callback 
+	//que recibe un error y la lista de favoritos
+	Favorito.find ({}).sort('-_id').exec ((err, favoritos) =>{ //Ordenado por _id
 
-	var favoritoId = req.params.id;
-	res.status(200).send({data: favoritoId});
+		if (err){
+			res.status(500).send({message: 'Error al devolver los marcadores'});
+		}
+		if(!favoritos){
+			res.status(404).send({message: 'No hay marcadores'});
+		}
+
+		res.status(200).send({favoritos});
+	});
+	
 }
 
 function saveFavorito (req,res){
@@ -45,11 +73,11 @@ function saveFavorito (req,res){
 	favorito.description = params.description;
 	favorito.url = params.url
 
-	//Para guardar en la bbdd
+	//Para guardar en la bbdd (método de )
 	favorito.save((err, favoritoStored) => {
 
 		if (err){
-			res.status(500).send ({message: 'Error al guardar el marcador'});
+			res.status(500).send({message: 'Error al guardar el marcador'});
 		}
 
 		res.status(200).send({favorito: favoritoStored});	
@@ -59,19 +87,62 @@ function saveFavorito (req,res){
 
 function updateFavorito (req,res){
 	
-	var params = req.body;
-	res.status(200).send ({update:true, favorito: params});	
+	var update = req.body;
+	var favoritoId = req.params.id;
+
+	console.log (update);
+
+	//Se utiliza el método findByIdAndUpdate que nos proporciona moongose
+	//Se pasan como parametros el id del favorito que queremos actualizar,
+	//los datos a actualizar y una funcion de callback
+	Favorito.findByIdAndUpdate (favoritoId, update, function (err, favoritoUpdate){
+
+		if (err){
+			res.status(500).send({message: 'Error al actualizar el marcador'});
+		}
+
+		res.status(200).send({favorito: favoritoUpdate});	
+
+	});
+	
 }
 
 function deleteFavorito (req,res){
 	
 	var favoritoId = req.params.id;
-	res.status(200).send({ delete:true, data: favoritoId});
+
+	Favorito.findById (favoritoId, function (err, favorito){
+
+		if (err){
+
+			res.status(500).send({message: 'Error al devolver el marcador'});
+		}  
+
+		if(!favorito){
+			res.status(404).send({message: 'No hay marcadores'});
+		} else {
+
+			favorito.remove (err =>{
+
+				if (err){
+
+					res.status(500).send({message: 'Error al borrar el marcador'});
+				}  else {
+
+					res.status(200).send({message: 'El marcador se ha eliminado!!'});
+				}
+
+			});
+		}
+
+	});
+
 }
 
 module.exports = {
 	prueba,
 	getFavorito,
+	getFavoritos,
 	saveFavorito,
 	updateFavorito,
 	deleteFavorito
